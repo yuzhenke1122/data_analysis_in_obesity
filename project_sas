@@ -1,0 +1,60 @@
+**read data;
+data a1;
+infile 'C:\Users\pmy\Desktop\2021Spring\STAT 525\Project\datanew2.txt' dlm='09'x;
+input y PH poorPH poorMH smoking FEI inactivity exercise_opp ex_driking
+physicians dentists MHprovider college unemployment low_income
+long_commute diabetes food_insecure ins_sleep median_income lmt_HF;
+
+**histogram of y;
+proc univariate data=a1;
+var y;
+histogram y;
+run;
+
+**correlation btw predictor variables;
+proc corr;
+var PH poorPH poorMH smoking FEI inactivity exercise_opp ex_driking
+physicians dentists MHprovider college unemployment low_income
+long_commute diabetes food_insecure ins_sleep median_income lmt_HF;
+run;
+
+**model selection;
+proc reg data=a1;
+model y = PH poorPH poorMH smoking FEI inactivity exercise_opp ex_driking
+physicians dentists MHprovider college unemployment low_income
+long_commute diabetes food_insecure ins_sleep median_income lmt_HF /
+selection=rsquare adjrsq cp aic bic best=2 vif;
+run;
+
+**outliers/;
+**cp;
+proc reg data=a1;
+model y = poorPH poorMH inactivity/
+r partial influence vif ss1 ss2;
+run;
+
+**2 variables (selected final model);
+proc reg data=a1;
+model y = poorPH inactivity /
+r partial influence vif ss1 ss2;
+run;
+
+**remove outliers that are influential;
+**read data;
+data a2;
+infile 'C:\Users\pmy\Desktop\2021Spring\STAT 525\Project\datanew3_nooutlier.txt' dlm='09'x;
+input y PH poorPH poorMH smoking FEI inactivity exercise_opp ex_driking
+physicians dentists MHprovider college unemployment low_income
+long_commute diabetes food_insecure ins_sleep median_income lmt_HF;
+
+**histogram of y;
+proc univariate data=a2;
+var y;
+histogram y;
+run; 
+
+**2 variables;
+proc reg data=a2;
+model y = poorPH inactivity /
+r partial influence vif ss1 ss2;
+run;
